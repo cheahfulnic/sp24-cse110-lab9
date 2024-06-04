@@ -87,7 +87,20 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "1a110d5b44b04f4da6a7f33268e61370"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>  
+  <script>
+    class EmptyError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "EmptyError";
+      }
+    }
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +108,120 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new Error("Please enter numbers only.");
+        } else if (firstNum == '' || secondNum == '') {
+          throw new EmptyError('Please enter a number into each field.');
+        } else {
+          output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+        }
+      } catch (err) {
+        if (err instanceof EmptyError) {
+          alert('Missing data: ' + err.message);
+        } else {
+          alert('Invalid data: ' + err.message);
+        }
+        output.innerHTML = `${err}`
+      } finally {
+        console.log("Calculation attempted.");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
-    // Start your code here
+    // Start your code here (I added code above as well)
     // You may move this JS to another file if you wish
+    errorBtns[0].addEventListener('click', () => {
+      console.log('Console log clicked');
+    })
+
+    errorBtns[1].addEventListener('click', () => {
+      console.error('Console error clicked');
+    })
+  
+    errorBtns[2].addEventListener('click', () => {
+      console.count('Console count');
+    })
+
+    errorBtns[3].addEventListener('click', () => {
+      console.warn('Console warn clicked');
+    })
+
+    errorBtns[4].addEventListener('click', () => {
+      console.assert(false, 'Assertion with false expression clicked');
+    })
+
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    })
+
+    errorBtns[6].addEventListener('click', () => {
+      console.dir(errorBtns[6]);
+    })
+
+    errorBtns[7].addEventListener('click', () => {
+      console.dirxml(errorBtns[7]);
+    })  
+
+    errorBtns[8].addEventListener('click', () => {
+      console.group('console.group');
+    })  
+
+    errorBtns[9].addEventListener('click', () => {
+      console.groupEnd('console.group');
+    })  
+
+    errorBtns[10].addEventListener('click', () => {
+      var people = [
+        {
+          first: 'René',
+          last: 'Magritte',
+        },
+        {
+          first: 'Chaim',
+          last: 'Soutine',
+          birthday: '18930113',
+        },
+        {
+          first: 'Henri',
+          last: 'Matisse',
+        }
+      ];
+      console.table(people);
+    })  
+
+    errorBtns[11].addEventListener('click', () => {
+      console.time('console.time');
+    })  
+
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd('console.time');
+    })
+
+    errorBtns[13].addEventListener('click', () => {
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    })  
+
+    /* scripts that may trigger errors */
+    function badCode()
+    {
+      alert('Good code running when suddenly...');
+      abooM('bad code!'); /* BAD CODE ON PURPOSE */ 
+    }
+    errorBtns[14].addEventListener('click', () => {
+      try {
+        badCode();
+      } catch(err) {
+        TrackJS.track(err);
+      } finally {
+        console.log('Trigger a Global Error clicked')
+      }
+    })
   </script>
 </body>
 
